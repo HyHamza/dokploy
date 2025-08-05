@@ -176,6 +176,11 @@ global:
 entryPoints:
   web:
     address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
   websecure:
     address: ":443"
 
@@ -190,8 +195,18 @@ providers:
   file:
     directory: "/etc/dokploy/traefik/dynamic"
     watch: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: "your-email@example.com"
+      storage: "/etc/dokploy/traefik/dynamic/acme.json"
+      httpChallenge:
+        entryPoint: web
 EOF
         chmod 644 "$TRAEFIK_DIR/traefik.yml"
+        touch "$TRAEFIK_DIR/dynamic/acme.json"
+        chmod 600 "$TRAEFIK_DIR/dynamic/acme.json"
     fi
 
     # Deploy PostgreSQL service
@@ -233,7 +248,7 @@ EOF
         --name dokploy-traefik \
         --restart always \
         -v /etc/dokploy/traefik/traefik.yml:/etc/traefik/traefik.yml \
-        -v /etc/dokploy/traefik/dynamic:/etc/traefik/dynamic \
+        -v /etc/dokploy/traefik/dynamic:/etc/dokploy/traefik/dynamic \
         -v /var/run/docker.sock:/var/run/docker.sock \
         -p 80:80/tcp \
         -p 443:443/tcp \
