@@ -103,6 +103,19 @@ const { handler, api } = betterAuth({
 									message: "User not found",
 								});
 							}
+						} else {
+							const allowPublicRegistration =
+								process.env.DOKPLOY_ALLOW_PUBLIC_REGISTRATION === "true";
+							if (!allowPublicRegistration) {
+								const isAdminPresent = await db.query.member.findFirst({
+									where: eq(schema.member.role, "owner"),
+								});
+								if (isAdminPresent) {
+									throw new APIError("BAD_REQUEST", {
+										message: "Admin is already created",
+									});
+								}
+							}
 						}
 					}
 				},
