@@ -26,9 +26,12 @@ import {
 } from "@/components/ui/input-otp";
 import { Label } from "@/components/ui/label";
 import { authClient } from "@/lib/auth-client";
+import { appRouter } from "@/server/api/root";
+import { api } from "@/utils/api";
 import { IS_CLOUD, isAdminPresent } from "@dokploy/server";
 import { validateRequest } from "@dokploy/server/lib/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import { REGEXP_ONLY_DIGITS } from "input-otp";
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
@@ -36,6 +39,7 @@ import { useRouter } from "next/router";
 import { type ReactElement, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import superjson from "superjson";
 import { z } from "zod";
 
 const LoginSchema = z.object({
@@ -51,8 +55,9 @@ type LoginForm = z.infer<typeof LoginSchema>;
 
 interface Props {
 	IS_CLOUD: boolean;
+	isPublicRegistrationEnabled?: boolean;
 }
-export default function Home({ IS_CLOUD }: Props) {
+export default function Home({ IS_CLOUD, isPublicRegistrationEnabled }: Props) {
 	const router = useRouter();
 	const [isLoginLoading, setIsLoginLoading] = useState(false);
 	const [isTwoFactorLoading, setIsTwoFactorLoading] = useState(false);
@@ -428,7 +433,7 @@ export default function Home({ IS_CLOUD }: Props) {
 
 				<div className="flex flex-row justify-between flex-wrap">
 					<div className="mt-4 text-center text-sm flex flex-row justify-center gap-2">
-						{IS_CLOUD && (
+						{(IS_CLOUD || isPublicRegistrationEnabled) && (
 							<Link
 								className="hover:underline text-muted-foreground"
 								href="/register"
@@ -487,6 +492,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 		};
 	}
 	const hasAdmin = await isAdminPresent();
+	const { req, res } = context;
+	const { user, session } = await validateRequest(req);
+
+	const helpers = createServerSideHelpers({
+		router: appRouter,
+		ctx: {
+			req: req as any,
+			res: res as any,
+			db: null as any,
+			session: session as any,
+			user: user as any,
+		},
+		transformer: superjson,
+	});
+
+	const { isPublicRegistrationEnabled } =
+		await helpers.settings.getPublicRegistrationStatus.fetch();
 
 	if (!hasAdmin) {
 		return {
@@ -496,8 +518,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 			},
 		};
 	}
-
-	const { user } = await validateRequest(context.req);
 
 	if (user) {
 		return {
@@ -511,6 +531,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 	return {
 		props: {
 			hasAdmin,
+			isPublicRegistrationEnabled,
 		},
 	};
 }

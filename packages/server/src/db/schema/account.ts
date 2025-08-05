@@ -66,6 +66,9 @@ export const organization = pgTable("organization", {
 	ownerId: text("owner_id")
 		.notNull()
 		.references(() => users_temp.id, { onDelete: "cascade" }),
+	isPublicRegistrationEnabled: boolean("isPublicRegistrationEnabled")
+		.notNull()
+		.default(false),
 });
 
 export const organizationRelations = relations(

@@ -1,0 +1,1 @@
+ALTER TABLE "organization" ADD COLUMN "isPublicRegistrationEnabled" boolean DEFAULT false NOT NULL;

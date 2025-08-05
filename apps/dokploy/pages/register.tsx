@@ -13,8 +13,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
+import { appRouter } from "@/server/api/root";
 import { IS_CLOUD, isAdminPresent, validateRequest } from "@dokploy/server";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createServerSideHelpers } from "@trpc/react-query/server";
 import { AlertTriangle } from "lucide-react";
 import type { GetServerSidePropsContext } from "next";
 import Link from "next/link";
@@ -22,6 +24,7 @@ import { useRouter } from "next/router";
 import { type ReactElement, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
+import superjson from "superjson";
 import { z } from "zod";
 
 const registerSchema = z
@@ -278,10 +281,25 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 		};
 	}
 	const hasAdmin = await isAdminPresent();
-	const allowPublicRegistration =
-		process.env.DOKPLOY_ALLOW_PUBLIC_REGISTRATION === "true";
+	const { req, res } = context;
+	const { user, session } = await validateRequest(req);
 
-	if (hasAdmin && !allowPublicRegistration) {
+	const helpers = createServerSideHelpers({
+		router: appRouter,
+		ctx: {
+			req: req as any,
+			res: res as any,
+			db: null as any,
+			session: session as any,
+			user: user as any,
+		},
+		transformer: superjson,
+	});
+
+	const { isPublicRegistrationEnabled } =
+		await helpers.settings.getPublicRegistrationStatus.fetch();
+
+	if (hasAdmin && !isPublicRegistrationEnabled) {
 		return {
 			redirect: {
 				permanent: false,

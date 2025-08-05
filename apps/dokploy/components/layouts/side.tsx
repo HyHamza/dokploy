@@ -280,6 +280,14 @@ const MENU: Menu = {
 		},
 		{
 			isSingle: true,
+			title: "Authentication",
+			url: "/dashboard/settings/authentication",
+			icon: ShieldCheck,
+			// Only enabled for admins
+			isEnabled: ({ auth }) => !!(auth?.role === "owner"),
+		},
+		{
+			isSingle: true,
 			title: "Users",
 			icon: Users,
 			url: "/dashboard/settings/users",
