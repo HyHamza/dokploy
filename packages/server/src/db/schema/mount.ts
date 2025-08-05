@@ -10,16 +10,8 @@ import { mongo } from "./mongo";
 import { mysql } from "./mysql";
 import { postgres } from "./postgres";
 import { redis } from "./redis";
+import { serviceType } from "./service-type";
 
-export const serviceType = pgEnum("serviceType", [
-	"application",
-	"postgres",
-	"mysql",
-	"mariadb",
-	"mongo",
-	"redis",
-	"compose",
-]);
 
 export const mountType = pgEnum("mountType", ["bind", "volume", "file"]);
 
