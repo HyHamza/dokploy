@@ -135,11 +135,11 @@ install_dokploy() {
     echo "Creating .env.production file..."
     cd "$DOKPLOY_SRC_DIR"
     if [ ! -f ".env.production" ]; then
-        cat << 'EOF' > .env.production
+cat << EOF > .env.production
 NODE_ENV=production
 DATABASE_URL=postgresql://dokploy:amukds4wi9001583845717ad2@dokploy-postgres:5432/dokploy
 REDIS_URL=redis://dokploy-redis:6379
-NEXTAUTH_SECRET=your-secret-key-here
+NEXTAUTH_SECRET=$(openssl rand -hex 32)
 NEXTAUTH_URL=http://localhost:3000
 EOF
         echo ".env.production file created"
