@@ -103,20 +103,11 @@ const { handler, api } = betterAuth({
 									message: "User not found",
 								});
 							}
-						} else {
-							const isAdminPresent = await db.query.member.findFirst({
-								where: eq(schema.member.role, "owner"),
-							});
-							if (isAdminPresent) {
-								throw new APIError("BAD_REQUEST", {
-									message: "Admin is already created",
-								});
-							}
 						}
 					}
 				},
 				after: async (user) => {
-					const isAdminPresent = await db.query.member.findFirst({
+					const ownerMember = await db.query.member.findFirst({
 						where: eq(schema.member.role, "owner"),
 					});
 
@@ -126,7 +117,7 @@ const { handler, api } = betterAuth({
 						});
 					}
 
-					if (IS_CLOUD || !isAdminPresent) {
+					if (IS_CLOUD || !ownerMember) {
 						await db.transaction(async (tx) => {
 							const organization = await tx
 								.insert(schema.organization)
@@ -144,6 +135,13 @@ const { handler, api } = betterAuth({
 								role: "owner",
 								createdAt: new Date(),
 							});
+						});
+					} else {
+						await db.insert(schema.member).values({
+							userId: user.id,
+							organizationId: ownerMember.organizationId,
+							role: "member",
+							createdAt: new Date(),
 						});
 					}
 				},
