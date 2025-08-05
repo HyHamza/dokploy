@@ -16,28 +16,20 @@ export const createTraefikConfig = (appName: string) => {
 	const config: FileConfig = {
 		http: {
 			routers: {
-				...(process.env.NODE_ENV === "production"
-					? {}
-					: {
-							[`${appName}-router-1`]: {
-								rule: domainDefault,
-								service: `${appName}-service-1`,
-								entryPoints: ["web"],
-							},
-						}),
+				[`${appName}-router-1`]: {
+					rule: domainDefault,
+					service: `${appName}-service-1`,
+					entryPoints: ["web"],
+				},
 			},
 
 			services: {
-				...(process.env.NODE_ENV === "production"
-					? {}
-					: {
-							[`${appName}-service-1`]: {
-								loadBalancer: {
-									servers: [{ url: serviceURLDefault }],
-									passHostHeader: true,
-								},
-							},
-						}),
+				[`${appName}-service-1`]: {
+					loadBalancer: {
+						servers: [{ url: serviceURLDefault }],
+						passHostHeader: true,
+					},
+				},
 			},
 		},
 	};

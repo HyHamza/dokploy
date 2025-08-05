@@ -141,6 +141,8 @@ DATABASE_URL=postgresql://dokploy:amukds4wi9001583845717ad2@dokploy-postgres:543
 REDIS_URL=redis://dokploy-redis:6379
 NEXTAUTH_SECRET=$(openssl rand -hex 32)
 NEXTAUTH_URL=http://localhost:3000
+GITHUB_CLIENT_ID=YOUR_GITHUB_CLIENT_ID
+GITHUB_CLIENT_SECRET=YOUR_GITHUB_CLIENT_SECRET
 EOF
         echo ".env.production file created"
     else
