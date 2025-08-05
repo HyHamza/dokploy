@@ -414,11 +414,18 @@ export const writeTraefikSetup = async (
 	}
 };
 
-export const getPublicRegistrationStatus = async (organizationId: string) => {
-	const org = await db.query.organization.findFirst({
-		where: eq(organization.id, organizationId),
-	});
-
+export const getPublicRegistrationStatus = async (
+	organizationId?: string | null,
+) => {
+	if (organizationId) {
+		const org = await db.query.organization.findFirst({
+			where: eq(organization.id, organizationId),
+		});
+		return {
+			isPublicRegistrationEnabled: org?.isPublicRegistrationEnabled ?? false,
+		};
+	}
+	const org = await db.query.organization.findFirst();
 	return {
 		isPublicRegistrationEnabled: org?.isPublicRegistrationEnabled ?? false,
 	};
