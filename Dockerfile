@@ -64,5 +64,8 @@ RUN curl -sSL https://railpack.com/install.sh | bash
 # Install buildpacks
 COPY --from=buildpacksio/pack:0.35.0 /usr/local/bin/pack /usr/local/bin/pack
 
+COPY ./apps/dokploy/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
 EXPOSE 3000
-CMD [ "pnpm", "start" ]
+CMD [ "./entrypoint.sh" ]
