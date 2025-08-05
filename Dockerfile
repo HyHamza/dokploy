@@ -40,6 +40,8 @@ COPY --from=build /prod/dokploy/next.config.mjs ./next.config.mjs
 COPY --from=build /prod/dokploy/public ./public
 COPY --from=build /prod/dokploy/package.json ./package.json
 COPY --from=build /prod/dokploy/drizzle ./drizzle
+COPY --from=build /usr/src/app/apps/dokploy/migration.ts ./migration.ts
+COPY --from=build /usr/src/app/apps/dokploy/tsconfig.json ./tsconfig.json
 COPY .env.production ./.env
 COPY --from=build /prod/dokploy/components.json ./components.json
 COPY --from=build /prod/dokploy/node_modules ./node_modules
