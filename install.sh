@@ -131,6 +131,22 @@ install_dokploy() {
         exit 1
     fi
 
+    # Create .env.production file if it doesn't exist
+    echo "Creating .env.production file..."
+    cd "$DOKPLOY_SRC_DIR"
+    if [ ! -f ".env.production" ]; then
+        cat << 'EOF' > .env.production
+NODE_ENV=production
+DATABASE_URL=postgresql://dokploy:amukds4wi9001583845717ad2@dokploy-postgres:5432/dokploy
+REDIS_URL=redis://dokploy-redis:6379
+NEXTAUTH_SECRET=your-secret-key-here
+NEXTAUTH_URL=http://localhost:3000
+EOF
+        echo ".env.production file created"
+    else
+        echo ".env.production file already exists"
+    fi
+
     # Check for Dockerfile and build the image
     if [ -f "$DOKPLOY_SRC_DIR/Dockerfile" ]; then
         echo "Building Dokploy Docker image from source..."
@@ -264,6 +280,19 @@ update_dokploy() {
     else
         echo "Error: Dokploy source directory ($DOKPLOY_SRC_DIR) not found. Please run install first." >&2
         exit 1
+    fi
+
+    # Create .env.production file if it doesn't exist after update
+    if [ ! -f ".env.production" ]; then
+        echo "Creating .env.production file after update..."
+        cat << 'EOF' > .env.production
+NODE_ENV=production
+DATABASE_URL=postgresql://dokploy:amukds4wi9001583845717ad2@dokploy-postgres:5432/dokploy
+REDIS_URL=redis://dokploy-redis:6379
+NEXTAUTH_SECRET=your-secret-key-here
+NEXTAUTH_URL=http://localhost:3000
+EOF
+        echo ".env.production file created"
     fi
 
     # Rebuild the Docker image
