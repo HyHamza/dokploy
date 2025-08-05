@@ -278,8 +278,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 		};
 	}
 	const hasAdmin = await isAdminPresent();
+	const allowPublicRegistration =
+		process.env.DOKPLOY_ALLOW_PUBLIC_REGISTRATION === "true";
 
-	if (hasAdmin) {
+	if (hasAdmin && !allowPublicRegistration) {
 		return {
 			redirect: {
 				permanent: false,
