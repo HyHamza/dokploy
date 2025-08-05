@@ -9,7 +9,7 @@ import { deployments } from "./deployment";
 import { destinations } from "./destination";
 import { mariadb } from "./mariadb";
 import { mongo } from "./mongo";
-import { serviceType } from "./mount";
+import { serviceType } from "./service-type";
 import { mysql } from "./mysql";
 import { postgres } from "./postgres";
 import { redis } from "./redis";
