@@ -721,7 +721,13 @@ export const settingsRouter = createTRPCRouter({
 		return { status: "not_cloud" };
 	}),
 
-	getPublicRegistrationStatus: protectedProcedure.query(async ({ ctx }) => {
+	getPublicRegistrationStatus: publicProcedure.query(async ({ ctx }) => {
+		if (!ctx.session) {
+			// If there is no session, it means it's a fresh installation
+			// and we should allow the first user to register.
+			const admin = await db.query.organization.findFirst();
+			return { isPublicRegistrationEnabled: !admin };
+		}
 		const { isPublicRegistrationEnabled } = await getPublicRegistrationStatus(
 			ctx.session.activeOrganizationId,
 		);
