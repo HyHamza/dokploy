@@ -125,7 +125,7 @@ install_dokploy() {
     DOKPLOY_SRC_DIR="/tmp/dokploy"
     echo "Cloning Dokploy repository from https://github.com/HyHamza/dokploy..."
     rm -rf "$DOKPLOY_SRC_DIR"
-    git clone --depth 1 --branch fix/docker-entrypoint-migrations https://github.com/HyHamza/dokploy.git "$DOKPLOY_SRC_DIR"
+    git clone --depth 1 https://github.com/HyHamza/dokploy.git "$DOKPLOY_SRC_DIR"
     if [ $? -ne 0 ]; then
         echo "Error: Failed to clone Dokploy repository" >&2
         exit 1
