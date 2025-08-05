@@ -5,6 +5,9 @@ import {
 	execAsync,
 	execAsyncRemote,
 } from "@dokploy/server/utils/process/execAsync";
+import { db } from "@dokploy/server/db";
+import { organization } from "@dokploy/server/db/schema";
+import { eq } from "drizzle-orm";
 import {
 	initializeStandaloneTraefik,
 	initializeTraefikService,
@@ -409,4 +412,24 @@ export const writeTraefikSetup = async (
 			serverId: serverId,
 		});
 	}
+};
+
+export const getPublicRegistrationStatus = async (organizationId: string) => {
+	const org = await db.query.organization.findFirst({
+		where: eq(organization.id, organizationId),
+	});
+
+	return {
+		isPublicRegistrationEnabled: org?.isPublicRegistrationEnabled ?? false,
+	};
+};
+
+export const updatePublicRegistrationStatus = async (
+	organizationId: string,
+	enabled: boolean,
+) => {
+	await db
+		.update(organization)
+		.set({ isPublicRegistrationEnabled: enabled })
+		.where(eq(organization.id, organizationId));
 };

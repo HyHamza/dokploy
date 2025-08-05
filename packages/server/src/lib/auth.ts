@@ -104,15 +104,16 @@ const { handler, api } = betterAuth({
 								});
 							}
 						} else {
-							const allowPublicRegistration =
-								process.env.DOKPLOY_ALLOW_PUBLIC_REGISTRATION === "true";
-							if (!allowPublicRegistration) {
+							const organization = await db.query.organization.findFirst();
+
+							if (!organization?.isPublicRegistrationEnabled) {
 								const isAdminPresent = await db.query.member.findFirst({
 									where: eq(schema.member.role, "owner"),
 								});
+
 								if (isAdminPresent) {
 									throw new APIError("BAD_REQUEST", {
-										message: "Admin is already created",
+										message: "Public registration is disabled",
 									});
 								}
 							}

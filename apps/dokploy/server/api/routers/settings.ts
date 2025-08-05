@@ -33,8 +33,10 @@ import {
 	setupGPUSupport,
 	spawnAsync,
 	startLogCleanup,
+	getPublicRegistrationStatus,
 	stopLogCleanup,
 	updateLetsEncryptEmail,
+	updatePublicRegistrationStatus,
 	updateServerById,
 	updateServerTraefik,
 	updateUser,
@@ -718,6 +720,23 @@ export const settingsRouter = createTRPCRouter({
 		}
 		return { status: "not_cloud" };
 	}),
+
+	getPublicRegistrationStatus: protectedProcedure.query(async ({ ctx }) => {
+		const { isPublicRegistrationEnabled } = await getPublicRegistrationStatus(
+			ctx.session.activeOrganizationId,
+		);
+		return { isPublicRegistrationEnabled };
+	}),
+
+	updatePublicRegistrationStatus: adminProcedure
+		.input(z.object({ enabled: z.boolean() }))
+		.mutation(async ({ ctx, input }) => {
+			await updatePublicRegistrationStatus(
+				ctx.session.activeOrganizationId,
+				input.enabled,
+			);
+			return true;
+		}),
 	setupGPU: adminProcedure
 		.input(
 			z.object({
