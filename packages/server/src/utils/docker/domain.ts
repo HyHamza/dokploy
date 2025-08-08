@@ -250,10 +250,8 @@ export const addDomainToCompose = async (
 				labels.unshift("traefik.enable=true");
 			}
 			labels.unshift(...httpLabels);
-			if (!compose.isolatedDeployment) {
-				if (!labels.includes("traefik.docker.network=dokploy-network")) {
-					labels.unshift("traefik.docker.network=dokploy-network");
-				}
+			if (!labels.includes("traefik.docker.network=dokploy-network")) {
+				labels.unshift("traefik.docker.network=dokploy-network");
 			}
 		}
 
