@@ -255,18 +255,14 @@ export const addDomainToCompose = async (
 			}
 		}
 
-		if (!compose.isolatedDeployment) {
-			// Add the dokploy-network to the service
-			result.services[serviceName].networks = addDokployNetworkToService(
-				result.services[serviceName].networks,
-			);
-		}
+		// Add the dokploy-network to the service
+		result.services[serviceName].networks = addDokployNetworkToService(
+			result.services[serviceName].networks,
+		);
 	}
 
 	// Add dokploy-network to the root of the compose file
-	if (!compose.isolatedDeployment) {
-		result.networks = addDokployNetworkToRoot(result.networks);
-	}
+	result.networks = addDokployNetworkToRoot(result.networks);
 
 	return result;
 };
